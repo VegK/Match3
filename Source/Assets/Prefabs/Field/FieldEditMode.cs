@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 #if (UNITY_EDITOR)
 [ExecuteInEditMode]
@@ -26,7 +25,7 @@ public class FieldEditMode : MonoBehaviour
 	private void Update()
 	{
 		if (_fieldController != null)
-			_fieldController.RestorePositionCells();
+			_fieldController.RestoreGameObjectCells();
     }
 	#endregion
 	#endregion

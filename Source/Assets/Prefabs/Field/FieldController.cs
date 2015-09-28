@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 
 public class FieldController : MonoBehaviour
@@ -131,9 +130,9 @@ public class FieldController : MonoBehaviour
 		_cells = newCells;
 	}
 	/// <summary>
-	/// Восстановить положения ячеек.
+	/// Восстановить игровые объекты ячеек.
 	/// </summary>
-	public void RestorePositionCells()
+	public void RestoreGameObjectCells()
 	{
 		if (_cells == null)
 			return;
@@ -144,7 +143,12 @@ public class FieldController : MonoBehaviour
 			{
 				var cell = _cells[x, y];
 				if (cell != null)
-					cell.gameObject.transform.position = new Vector2(x, y);
+				{
+					var tr = cell.gameObject.transform;
+					tr.position = new Vector2(x, y);
+					tr.localRotation = Quaternion.identity;
+					tr.localScale = Vector3.one;
+				}
 			}
 		}
 	}

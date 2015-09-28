@@ -145,9 +145,10 @@ public class FieldController : MonoBehaviour
 				if (cell != null)
 				{
 					var tr = cell.gameObject.transform;
-					tr.position = new Vector2(x, y);
-					tr.localRotation = Quaternion.identity;
-					tr.localScale = Vector3.one;
+					var trPref = PrefabCell.transform;
+					tr.localPosition = new Vector2(x, y);
+					tr.localRotation = trPref.localRotation;
+					tr.localScale = trPref.localScale;
 				}
 			}
 		}

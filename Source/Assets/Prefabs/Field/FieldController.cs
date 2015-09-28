@@ -82,14 +82,16 @@ public class FieldController : MonoBehaviour
 		{
 			for (int x = Width; x < _cells.GetLength(0); x++)
 				for (int y = 0; y < _cells.GetLength(1); y++)
-					DestroyImmediate(_cells[x, y].gameObject);
+					if (_cells[x, y] != null)
+						DestroyImmediate(_cells[x, y].gameObject);
 		}
 
 		if (Height < _cells.GetLength(1))
 		{
 			for (int y = Height; y < _cells.GetLength(1); y++)
 				for (int x = 0; x < _cells.GetLength(0); x++)
-					DestroyImmediate(_cells[x, y].gameObject);
+					if (_cells[x, y] != null)
+						DestroyImmediate(_cells[x, y].gameObject);
 		}
 
 
@@ -146,6 +148,33 @@ public class FieldController : MonoBehaviour
 			}
 		}
 	}
+	/// <summary>
+	/// Восстановить связь с клетками.
+	/// </summary>
+	public void BindCells()
+	{
+		if (_cells == null)
+			_cells = new CellController[Width, Height];
+
+		var objs = gameObject.GetComponentsInChildren<CellController>();
+		foreach (CellController obj in objs)
+		{
+			var x = obj.X;
+			var y = obj.Y;
+			var addObj = false;
+
+			if (x < _cells.GetLength(0) && y < _cells.GetLength(1))
+				addObj = true;
+            if (addObj)
+				if (_cells[x, y] == null || _cells[x, y] == obj)
+					addObj = true;
+
+			if (addObj)
+				_cells[x, y] = obj;
+			else
+				DestroyImmediate(obj.gameObject);
+		}
+	}
 	#endregion
 	#region Private
 	/// <summary>
@@ -163,23 +192,6 @@ public class FieldController : MonoBehaviour
 		obj.X = x;
 		obj.Y = y;
 		return obj;
-	}
-	/// <summary>
-	/// Восстановить связь с клетками.
-	/// </summary>
-	private void BindCells()
-	{
-		var objs = gameObject.GetComponentsInChildren<CellController>();
-		foreach (CellController obj in objs)
-		{
-			var x = obj.X;
-			var y = obj.Y;
-
-			if (_cells[x, y] == null)
-				_cells[x, y] = obj;
-			else
-				DestroyImmediate(obj.gameObject);
-		}
 	}
 	/// <summary>
 	/// Уничтожить ячейки и очистить массив ячеек.

@@ -17,9 +17,12 @@ public class FieldControllerEditor : Editor
 	#region Public
 	public override void OnInspectorGUI()
 	{
-		base.OnInspectorGUI();
-
 		var field = target as FieldController;
+
+		if (GUILayout.Button("Восстановить связи с ячейками"))
+			field.BindCells();
+
+		base.OnInspectorGUI();
 
 		if (GUILayout.Button("Создать новое поле"))
 			field.CreateField();

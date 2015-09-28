@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+#if (UNITY_EDITOR)
 [ExecuteInEditMode]
 public class FieldEditMode : MonoBehaviour
 {
@@ -30,3 +31,4 @@ public class FieldEditMode : MonoBehaviour
 	#endregion
 	#endregion
 }
+#endif

@@ -5,8 +5,10 @@ public class CellController : MonoBehaviour
 {
 	#region Properties
 	#region Public
-	public int X { get; set; }
-	public int Y { get; set; }
+	[HideInInspector]
+	public int X;
+	[HideInInspector]
+	public int Y;
 	#endregion
 	#region Private
 

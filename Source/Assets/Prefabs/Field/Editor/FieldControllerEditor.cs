@@ -23,6 +23,13 @@ public class FieldControllerEditor : Editor
 
 		if (GUILayout.Button("Создать новое поле"))
 			field.CreateField();
+
+		GUI.enabled = field.CheckParams();
+		if (GUILayout.Button("Заполнить пустые элементы поля"))
+			field.FillField();
+		if (GUILayout.Button("Изменить размер поля"))
+			field.ResizeField(false);
+		GUI.enabled = true;
 	}
 	#endregion
 	#region Private

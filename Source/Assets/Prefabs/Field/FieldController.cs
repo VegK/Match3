@@ -6,11 +6,14 @@ public class FieldController : MonoBehaviour
 {
 	#region Properties
 	#region Public
+	[Header("Prefabs")]
 	public CellController PrefabCell;
 	public GameObject PrefabElement;
 
+	[Header("Параметры поля")]
 	public int Width = 5;
 	public int Height = 5;
+
 	#endregion
 	#region Private
 	private CellController[,] _cells;
@@ -20,28 +23,110 @@ public class FieldController : MonoBehaviour
 	#region Methods
 	#region Public
 	/// <summary>
+	/// Проверить параметры поля.
+	/// </summary>
+	/// <returns>Возвращает true, если параметры в порядке.</returns>
+	public bool CheckParams()
+	{
+		var res = true;
+		res &= (_cells != null);
+		return res;
+	}
+	/// <summary>
 	/// Создать новое поле.
 	/// </summary>
 	public void CreateField()
 	{
-		if (_cells == null)
-			_cells = new CellController[Width, Height];
-
 		ClearField();
+
+		_cells = new CellController[Width, Height];
 
         for (int x = 0; x < Width; x++)
 		{
 			for (int y = 0; y < Height; y++)
 			{
-				var obj = Instantiate(PrefabCell);
-				obj.name = x + ":" + y;
-				obj.transform.position = new Vector2(x, y);
-				obj.transform.SetParent(transform);
-				obj.X = x;
-				obj.Y = y;
+				var obj = CreateCell(x, y);
 				_cells[x, y] = obj;
 			}
 		}
+	}
+	/// <summary>
+	/// Заполнить пустые элементы поля ячейками.
+	/// </summary>
+	public void FillField()
+	{
+		for (int x = 0; x < Width; x++)
+		{
+			for (int y = 0; y < Height; y++)
+			{
+				var cell = _cells[x, y];
+				if (cell == null)
+				{
+					var obj = CreateCell(x, y);
+					_cells[x, y] = obj;
+				}
+			}
+		}
+	}
+	/// <summary>
+	/// Изменить размер поля.
+	/// </summary>
+	/// <param name="clear">Очистить поле.</param>
+	public void ResizeField(bool clear)
+	{
+		if (clear)
+			ClearField();
+
+		// Уничтожаем лишние объекты.
+		if (Width < _cells.GetLength(0))
+		{
+			for (int x = Width; x < _cells.GetLength(0); x++)
+				for (int y = 0; y < _cells.GetLength(1); y++)
+					DestroyImmediate(_cells[x, y].gameObject);
+		}
+
+		if (Height < _cells.GetLength(1))
+		{
+			for (int y = Height; y < _cells.GetLength(1); y++)
+				for (int x = 0; x < _cells.GetLength(0); x++)
+					DestroyImmediate(_cells[x, y].gameObject);
+		}
+
+
+
+		// Формируем новое поле.
+		var newCells = new CellController[Width, Height];
+
+		// Создаём новые ячейки, если новый размер поля больше старого.
+		if (Width > _cells.GetLength(0))
+		{
+			for (int x = _cells.GetLength(0); x < Width; x++)
+				for (int y = 0; y < Height; y++)
+					if (newCells[x, y] == null)
+						newCells[x, y] = CreateCell(x, y);
+		}
+
+		if (Height > _cells.GetLength(1))
+		{
+			for (int y = _cells.GetLength(1); y < Height; y++)
+				for (int x = 0; x < Width; x++)
+					if (newCells[x, y] == null)
+						newCells[x, y] = CreateCell(x, y);
+		}
+
+		// Переносим данные в новое поле.
+		var minWidht = Width;
+		if (_cells.GetLength(0) < Width)
+			minWidht = _cells.GetLength(0);
+
+		var minHeight = Height;
+		if (_cells.GetLength(1) < Height)
+			minHeight = _cells.GetLength(1);
+
+		for (int x = 0; x < minWidht; x++)
+			for (int y = 0; y < minHeight; y++)
+				newCells[x, y] = _cells[x, y];
+		_cells = newCells;
 	}
 	/// <summary>
 	/// Восстановить положения ячеек.
@@ -49,14 +134,11 @@ public class FieldController : MonoBehaviour
 	public void RestorePositionCells()
 	{
 		if (_cells == null)
-		{
-			_cells = new CellController[Width, Height];
-			BindCells();
-		}
+			return;
 
-		for (int x = 0; x < Width; x++)
+		for (int x = 0; x < _cells.GetLength(0); x++)
 		{
-			for (int y = 0; y < Height; y++)
+			for (int y = 0; y < _cells.GetLength(1); y++)
 			{
 				var cell = _cells[x, y];
 				if (cell != null)
@@ -66,6 +148,22 @@ public class FieldController : MonoBehaviour
 	}
 	#endregion
 	#region Private
+	/// <summary>
+	/// Создать ячейку.
+	/// </summary>
+	/// <param name="x">Позиция по X.</param>
+	/// <param name="y">Позиция по Y.</param>
+	/// <returns>Ячейка.</returns>
+	private CellController CreateCell(int x, int y)
+	{
+		var obj = Instantiate(PrefabCell);
+		obj.name = x + ":" + y;
+		obj.transform.position = new Vector2(x, y);
+		obj.transform.SetParent(transform);
+		obj.X = x;
+		obj.Y = y;
+		return obj;
+	}
 	/// <summary>
 	/// Восстановить связь с клетками.
 	/// </summary>

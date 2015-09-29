@@ -25,7 +25,11 @@ public class FieldEditMode : MonoBehaviour
 	private void Update()
 	{
 		if (_fieldController != null)
+		{
 			_fieldController.RestoreGameObjectCells();
+			if (!_fieldController.CheckParams())
+				_fieldController.BindCells();
+		}
     }
 	#endregion
 	#endregion

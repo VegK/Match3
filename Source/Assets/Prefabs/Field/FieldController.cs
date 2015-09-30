@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public partial class FieldController : MonoBehaviour
 {
@@ -7,17 +8,12 @@ public partial class FieldController : MonoBehaviour
 	#region Public
 	[Header("Prefabs")]
 	public CellController PrefabCell;
-	public ElementController PrefabElement1;
-	public ElementController PrefabElement2;
-	public ElementController PrefabElement3;
-	public ElementController PrefabElement4;
-	public ElementController PrefabElement5;
-	public ElementController PrefabElement6;
-	public ElementController PrefabElement7;
+	public ElementController[] PrefabElements;
 
 	[Header("Параметры поля")]
 	public int Width = 5;
 	public int Height = 5;
+	public int DestroyElementsCount = 0;
 
 	#endregion
 	#region Private
@@ -139,7 +135,9 @@ public partial class FieldController : MonoBehaviour
 	#region Private
 	private void Start()
 	{
-		ElementsStart();
+		BindCells();
+		FillFieldElements();
+		FullCheckField();
     }
 	/// <summary>
 	/// Уничтожить ячейки и очистить массив ячеек.
@@ -152,6 +150,125 @@ public partial class FieldController : MonoBehaviour
 
 		if (_cells != null)
 			Array.Clear(_cells, 0, _cells.Length);
+	}
+	/// <summary>
+	/// Заполнить поле случайными элементами.
+	/// </summary>
+	private bool FillFieldElements()
+	{
+		if (_cells == null)
+			return false;
+
+		for (int x = 0; x < _cells.GetLength(0); x++)
+		{
+			for (int y = 0; y < _cells.GetLength(1); y++)
+			{
+				var cell = _cells[x, y];
+				if (cell != null)
+					CreateElement(cell);
+			}
+		}
+		return true;
+	}
+	/// <summary>
+	/// Проверить все элементы на возможность уничтожения.
+	/// </summary>
+	public bool CheckElementsDestroyed()
+	{
+		var res = false;
+		for (int x = 0; x < _cells.GetLength(0); x++)
+		{
+			for (int y = 0; y < _cells.GetLength(1); y++)
+			{
+				var cell = _cells[x, y];
+				if (cell == null)
+					continue;
+
+				var items = CheckElementDestroyed(cell);
+				foreach (CellController item in items)
+					item.Element.MustByDestroyed = true;
+				if (items.Count > 0)
+					res = true;
+			}
+		}
+		return res;
+    }
+	/// <summary>
+	/// Уничтожить на поле все элементы с флагом "Должеть быть уничтожен".
+	/// </summary>
+	public void DestroyElements()
+	{
+		for (int x = 0; x < _cells.GetLength(0); x++)
+		{
+			for (int y = 0; y < _cells.GetLength(1); y++)
+			{
+				var cell = _cells[x, y];
+				if (cell == null)
+					continue;
+				if (cell.Element.MustByDestroyed)
+					DestroyElement(cell);
+			}
+		}
+    }
+	/// <summary>
+	/// Опустить элменты.
+	/// </summary>
+	public void LowerElements()
+	{
+		for (int x = 0; x < _cells.GetLength(0); x++)
+		{
+			for (int y = 0; y < _cells.GetLength(1); y++)
+			{
+				var cell = _cells[x, y];
+				if (cell == null)
+					continue;
+				if (cell.Element == null)
+				{
+					// Ищем элемент для опускания.
+					for (int y2 = y + 1; y2 < _cells.GetLength(1); y2++)
+					{
+						var cell2 = _cells[x, y2];
+						if (cell2 == null)
+							continue;
+						if (cell2.Element != null)
+						{
+							SwapElements(cell, cell2);
+                            break;
+						}
+					}
+				}
+			}
+		}
+	}
+	/// <summary>
+	/// Создать новые элементы в пустых ячейках.
+	/// </summary>
+	public void CreateElements()
+	{
+		for (int x = 0; x < _cells.GetLength(0); x++)
+		{
+			for (int y = 0; y < _cells.GetLength(1); y++)
+			{
+				var cell = _cells[x, y];
+				if (cell == null)
+					continue;
+				if (cell.Element == null)
+					CreateElement(cell);
+			}
+		}
+	}
+	/// <summary>
+	/// Провести полную проверку поля.
+	/// </summary>
+	private void FullCheckField()
+	{
+		if (CheckElementsDestroyed())
+		{
+			DestroyElements();
+			LowerElements();
+			CreateElements();
+			FullCheckField();
+		}
 	}
 	#endregion
 	#endregion

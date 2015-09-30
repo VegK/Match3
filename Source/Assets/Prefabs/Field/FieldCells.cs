@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public partial class FieldController
 {
@@ -61,7 +62,10 @@ public partial class FieldController
 					addObj = true;
 
 			if (addObj)
+			{
 				_cells[x, y] = obj;
+				obj.OnSelection += SelectionElement;
+			}
 			else
 				DestroyImmediate(obj.gameObject);
 		}

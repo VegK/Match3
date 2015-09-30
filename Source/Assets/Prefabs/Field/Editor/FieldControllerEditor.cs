@@ -33,6 +33,18 @@ public class FieldControllerEditor : Editor
 		if (GUILayout.Button("Изменить размер поля"))
 			field.ResizeField(false);
 		GUI.enabled = true;
+
+		// TODO: test
+		GUILayout.Space(15);
+		if (GUILayout.Button("Уничтожить элементы"))
+		{
+			field.CheckElementsDestroyed();
+			field.DestroyElements();
+		}
+		if (GUILayout.Button("Опустить элементы"))
+			field.LowerElements();
+		if (GUILayout.Button("Создать новые элементы"))
+			field.CreateElements();
 	}
 	#endregion
 	#region Private

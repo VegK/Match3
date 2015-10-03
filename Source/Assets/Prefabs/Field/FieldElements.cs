@@ -15,7 +15,37 @@ public partial class FieldController
 
 	#region Methods
 	#region Public
+	/// <summary>
+	/// Отслеживание свайпа.
+	/// </summary>
+	/// <param name="direction">Направление свайпа.</param>
+	public void SwypeElement(Swype.SwypeDirection direction)
+	{
+		if (_firstSelected == null)
+			return;
 
+		var x = _firstSelected.X;
+		var y = _firstSelected.Y;
+		CellController secondSelected = null;
+		switch (direction)
+		{
+			case Swype.SwypeDirection.Top:
+				secondSelected = _cells[x, y + 1];
+				break;
+			case Swype.SwypeDirection.Right:
+				secondSelected = _cells[x + 1, y];
+				break;
+			case Swype.SwypeDirection.Bottom:
+				secondSelected = _cells[x, y - 1];
+				break;
+			case Swype.SwypeDirection.Left:
+				secondSelected = _cells[x - 1, y];
+				break;
+		}
+
+		if (secondSelected != null)
+			SelectionElement(secondSelected);
+    }
 	#endregion
 	#region Private
 	/// <summary>
@@ -266,13 +296,13 @@ public partial class FieldController
 					CreateElements();
 
 					FullCheckField();
-                }
+				}
 				else
 					SwapElements(_firstSelected, selected);
 			}
 			_firstSelected = null;
-        }
-    }
+		}
+	}
 	#endregion
 	#endregion
 }

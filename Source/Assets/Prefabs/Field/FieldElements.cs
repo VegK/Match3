@@ -30,21 +30,24 @@ public partial class FieldController
 		switch (direction)
 		{
 			case Swype.SwypeDirection.Top:
-				secondSelected = _cells[x, y + 1];
+				if (y < Height)
+					secondSelected = _cells[x, y + 1];
 				break;
 			case Swype.SwypeDirection.Right:
-				secondSelected = _cells[x + 1, y];
+				if (x < Width)
+					secondSelected = _cells[x + 1, y];
 				break;
 			case Swype.SwypeDirection.Bottom:
-				secondSelected = _cells[x, y - 1];
+				if (y > 0)
+					secondSelected = _cells[x, y - 1];
 				break;
 			case Swype.SwypeDirection.Left:
-				secondSelected = _cells[x - 1, y];
+				if (x > 0)
+					secondSelected = _cells[x - 1, y];
 				break;
 		}
 
-		if (secondSelected != null)
-			SelectionElement(secondSelected);
+		SelectionElement(secondSelected);
     }
 	#endregion
 	#region Private
@@ -264,7 +267,7 @@ public partial class FieldController
 	/// <param name="cell">Ячейка.</param>
 	private void SelectionElement(CellController selected)
 	{
-		if (_firstSelected == selected)
+		if (_firstSelected == selected || selected == null)
 		{
 			_firstSelected = null;
 			return;

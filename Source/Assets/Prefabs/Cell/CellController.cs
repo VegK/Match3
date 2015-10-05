@@ -23,10 +23,11 @@ public class CellController : MonoBehaviour
 
 	#region Methods
 	#region Public
-	public void OnMouseDown()
+	public void OnMouseOver()
 	{
-		if (OnSelection != null)
-			OnSelection(this);
+		if (Input.GetMouseButtonDown(0))
+			if (OnSelection != null)
+				OnSelection(this);
 	}
 	#endregion
 	#region Private

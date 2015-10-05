@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public partial class FieldController : MonoBehaviour
 {
@@ -16,7 +18,8 @@ public partial class FieldController : MonoBehaviour
 
 	#endregion
 	#region Private
-	private bool _fixedField;
+	private int _fixedField;
+	private Dictionary<int, int> _fixedColumn;
 	#endregion
 	#endregion
 
@@ -134,9 +137,13 @@ public partial class FieldController : MonoBehaviour
 	#region Private
 	private void Start()
 	{
+		_fixedColumn = new Dictionary<int, int>();
+		for (int x = 0; x < Width; x++)
+			_fixedColumn.Add(x, 0);
+
 		BindCells();
-		FillFieldElements();
-		FullCheckField();
+		CreateElements();
+		StartCoroutine(FullCheckField());
     }
 	/// <summary>
 	/// Уничтожить ячейки и очистить массив ячеек.
@@ -149,25 +156,6 @@ public partial class FieldController : MonoBehaviour
 
 		if (_cells != null)
 			Array.Clear(_cells, 0, _cells.Length);
-	}
-	/// <summary>
-	/// Заполнить поле случайными элементами.
-	/// </summary>
-	private bool FillFieldElements()
-	{
-		if (_cells == null)
-			return false;
-
-		for (int x = 0; x < _cells.GetLength(0); x++)
-		{
-			for (int y = 0; y < _cells.GetLength(1); y++)
-			{
-				var cell = _cells[x, y];
-				if (cell != null)
-					CreateElement(cell);
-			}
-		}
-		return true;
 	}
 	/// <summary>
 	/// Проверить все элементы на возможность уничтожения.
@@ -215,29 +203,25 @@ public partial class FieldController : MonoBehaviour
 	public void LowerElements()
 	{
 		for (int x = 0; x < _cells.GetLength(0); x++)
-		{
 			for (int y = 0; y < _cells.GetLength(1); y++)
 			{
 				var cell = _cells[x, y];
 				if (cell == null)
 					continue;
 				if (cell.Element == null)
-				{
-					// Ищем элемент для опускания.
 					for (int y2 = y + 1; y2 < _cells.GetLength(1); y2++)
 					{
-						var cell2 = _cells[x, y2];
+						var cell2 = _cells[cell.X, y2];
 						if (cell2 == null)
 							continue;
 						if (cell2.Element != null)
 						{
-							SwapElements(cell, cell2);
+							LowerElement(cell2);
+							y = _cells.GetLength(1);
                             break;
 						}
-					}
-				}
+                    }
 			}
-		}
 	}
 	/// <summary>
 	/// Создать новые элементы в пустых ячейках.
@@ -259,14 +243,20 @@ public partial class FieldController : MonoBehaviour
 	/// <summary>
 	/// Провести полную проверку поля.
 	/// </summary>
-	private void FullCheckField()
+	private IEnumerator FullCheckField()
 	{
 		if (CheckElementsDestroyed())
 		{
 			DestroyElements();
+			while (_fixedField > 0)
+				yield return null;
 			LowerElements();
+			while (_fixedField > 0)
+				yield return null;
 			CreateElements();
-			FullCheckField();
+			while (_fixedField > 0)
+				yield return null;
+			StartCoroutine(FullCheckField());
 		}
 	}
 	#endregion

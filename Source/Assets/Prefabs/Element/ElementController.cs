@@ -82,6 +82,15 @@ public class ElementController : MonoBehaviour
 		StopAnimations();
 		PlayAnimationMove(AnimationDirection.Left);
 	}
+	/// <summary>
+	/// Запустить анимацию падения элемента.
+	/// </summary>
+	public void AnimationLower()
+	{
+		StopAnimations();
+		if (_animation != null)
+			_animation.Play(AnimationNames.Lower);
+	}
 	#endregion
 	#region Private
 	private void Start()
@@ -89,7 +98,10 @@ public class ElementController : MonoBehaviour
 		_animation = GetComponent<Animation>();
 		_defaultLocalScale = transform.localScale;
     }
-
+	/// <summary>
+	/// Запустить анимацию движения элемента.
+	/// </summary>
+	/// <param name="direction">Направление движения.</param>
 	private void PlayAnimationMove(AnimationDirection direction)
 	{
 		if (_animation == null)
@@ -121,6 +133,7 @@ public class ElementController : MonoBehaviour
 	public class NameAnimation
 	{
 		public string Selected = "Selected";
+		public string Lower = "Lower";
 		[Header("Перемещения")]
 		public string MoveUp = "MoveUp";
 		public string MoveRight = "MoveRight";

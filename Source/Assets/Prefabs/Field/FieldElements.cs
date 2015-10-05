@@ -267,7 +267,7 @@ public partial class FieldController
 	/// <param name="cell">Ячейка.</param>
 	private IEnumerator SelectionElement(CellController selected)
 	{
-		if (_fixedField)
+		if (_fixedField > 0)
 			yield break;
 
 		if (_firstSelected == selected || selected == null)
@@ -284,6 +284,9 @@ public partial class FieldController
         }
 		else
 		{
+			_firstSelected.Element.StopAnimations();
+			selected.Element.StopAnimations();
+
 			var swap = false;
 			if (selected.X <= _firstSelected.X + 1 &&
 				selected.X >= _firstSelected.X - 1 &&
@@ -297,16 +300,12 @@ public partial class FieldController
 				yield return StartCoroutine(PlaySwapAnimation(selected, _firstSelected));
 				SwapElements(selected, _firstSelected);
 
-				var list = CheckElementDestroyed(selected);
-				list.AddRange(CheckElementDestroyed(_firstSelected));
-				if (list.Count > 0)
+				var dest = (CheckElementDestroyed(selected).Count > 0);
+				if (!dest)
+					dest = (CheckElementDestroyed(_firstSelected).Count > 0);
+				if (dest)
 				{
-					foreach (CellController c in list)
-						DestroyElement(c);
-					LowerElements();
-					CreateElements();
-
-					FullCheckField();
+					StartCoroutine(FullCheckField());
 				}
 				else
 				{
@@ -315,15 +314,17 @@ public partial class FieldController
 				}
 			}
 
-			_firstSelected.Element.StopAnimations();
-			selected.Element.StopAnimations();
 			_firstSelected = null;
 		}
 	}
-
+	/// <summary>
+	/// Запустить анимацию смены местами элементов в ячейках.
+	/// </summary>
+	/// <param name="cell1">Ячейка.</param>
+	/// <param name="cell2">Ячейка.</param>
 	private IEnumerator PlaySwapAnimation(CellController cell1, CellController cell2)
 	{
-		_fixedField = true;
+		_fixedField++;
 
         if (cell1.Y == cell2.Y)
 		{
@@ -359,8 +360,74 @@ public partial class FieldController
 		cell1.Element.transform.localPosition = new Vector3(0, 0, -1);
 		cell2.Element.transform.localPosition = new Vector3(0, 0, -1);
 
-		_fixedField = false;
+		_fixedField--;
     }
+	/// <summary>
+	/// Опустить элемент если под ним пустая ячейка.
+	/// </summary>
+	/// <param name="cell">Ячейка с элементом.</param>
+	private void LowerElement(CellController cell)
+	{
+		var x = cell.X;
+		for (int y = cell.Y - 1; y >= 0; y--)
+		{
+			var cellY = _cells[x, y];
+			if (cellY == null)
+				continue;
+			if (cellY.Element == null)
+				StartCoroutine(LowerColumn(cell, cellY));
+			break;
+		}
+	}
+	/// <summary>
+	/// Опустить элементы в столбце включая текущий и выше.
+	/// </summary>
+	/// <param name="cell">Ячейка содержащая элемент для опускания.</param>
+	/// <param name="toCell">Куда опускать.</param>
+	private IEnumerator LowerColumn(CellController cell, CellController toCell)
+	{
+		var x = cell.X;
+
+		_fixedField++;
+		while (_fixedColumn[x] > 0)
+			yield return null;
+
+		var prevCell = toCell;
+        for (int y = cell.Y; y < _cells.GetLength(1); y++)
+		{
+			var cellY = _cells[x, y];
+			if (cellY == null)
+				continue;
+			if (cellY.Element == null)
+				break;
+
+			StartCoroutine(LowerColumnElement(cellY, prevCell));
+			prevCell = cellY;
+		}
+		_fixedField--;
+	}
+	/// <summary>
+	/// Опустить элемент до дна.
+	/// </summary>
+	/// <param name="cell">Элемент.</param>
+	/// <param name="toCell">Свободная ячейка под элементом.</param>
+	private IEnumerator LowerColumnElement(CellController cell, CellController toCell)
+	{
+		_fixedField++;
+		_fixedColumn[cell.X]++;
+
+		cell.Element.AnimationLower();
+		while (cell.Element.AnimationIsPlay())
+			yield return null;
+
+		_fixedField--;
+		_fixedColumn[cell.X]--;
+
+		cell.Element.transform.localPosition = new Vector3(0, 0, -1);
+		SwapElements(toCell, cell);
+
+		LowerElement(toCell);
+	}
 	#endregion
 	#endregion
 }

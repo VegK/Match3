@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
 
 public partial class FieldController : MonoBehaviour
 {
@@ -17,7 +16,7 @@ public partial class FieldController : MonoBehaviour
 
 	#endregion
 	#region Private
-
+	private bool _fixedField;
 	#endregion
 	#endregion
 

@@ -64,7 +64,7 @@ public partial class FieldController
 			if (addObj)
 			{
 				_cells[x, y] = obj;
-				obj.OnSelection += SelectionElement;
+				obj.OnSelection += new CellController.ChangeHandler(c => StartCoroutine(SelectionElement(c)));
 			}
 			else
 				DestroyImmediate(obj.gameObject);

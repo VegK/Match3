@@ -30,11 +30,11 @@ public partial class FieldController
 		switch (direction)
 		{
 			case Swype.SwypeDirection.Top:
-				if (y < Height)
+				if (y < Height - 1)
 					secondSelected = _cells[x, y + 1];
 				break;
 			case Swype.SwypeDirection.Right:
-				if (x < Width)
+				if (x < Width - 1)
 					secondSelected = _cells[x + 1, y];
 				break;
 			case Swype.SwypeDirection.Bottom:
@@ -47,7 +47,7 @@ public partial class FieldController
 				break;
 		}
 
-		SelectionElement(secondSelected);
+		StartCoroutine(	SelectionElement(secondSelected));
     }
 	#endregion
 	#region Private
@@ -265,16 +265,23 @@ public partial class FieldController
 	/// Выбрать элемент.
 	/// </summary>
 	/// <param name="cell">Ячейка.</param>
-	private void SelectionElement(CellController selected)
+	private IEnumerator SelectionElement(CellController selected)
 	{
+		if (_fixedField)
+			yield break;
+
 		if (_firstSelected == selected || selected == null)
 		{
+			_firstSelected.Element.StopAnimations();
 			_firstSelected = null;
-			return;
+			yield break;
 		}
 
 		if (_firstSelected == null)
+		{
 			_firstSelected = selected;
+			_firstSelected.Element.AnimationSelected();
+        }
 		else
 		{
 			var swap = false;
@@ -287,6 +294,7 @@ public partial class FieldController
 				swap = true;
 			if (swap)
 			{
+				yield return StartCoroutine(PlaySwapAnimation(selected, _firstSelected));
 				SwapElements(selected, _firstSelected);
 
 				var list = CheckElementDestroyed(selected);
@@ -301,11 +309,58 @@ public partial class FieldController
 					FullCheckField();
 				}
 				else
+				{
+					yield return StartCoroutine(PlaySwapAnimation(selected, _firstSelected));
 					SwapElements(_firstSelected, selected);
+				}
 			}
+
+			_firstSelected.Element.StopAnimations();
+			selected.Element.StopAnimations();
 			_firstSelected = null;
 		}
 	}
+
+	private IEnumerator PlaySwapAnimation(CellController cell1, CellController cell2)
+	{
+		_fixedField = true;
+
+        if (cell1.Y == cell2.Y)
+		{
+			if (cell1.X > cell2.X)
+			{
+				cell1.Element.AnimationLeft();
+				cell2.Element.AnimationRight();
+			}
+			else
+			{
+				cell1.Element.AnimationRight();
+				cell2.Element.AnimationLeft();
+			}
+		}
+		else
+		{
+			if (cell1.Y > cell2.Y)
+			{
+				cell1.Element.AnimationDown();
+				cell2.Element.AnimationUp();
+			}
+			else
+			{
+				cell1.Element.AnimationUp();
+				cell2.Element.AnimationDown();
+			}
+		}
+
+		// Ждём окончания анимаций.
+		while (cell1.Element.AnimationIsPlay() && cell2.Element.AnimationIsPlay())
+			yield return null;
+
+		cell1.Element.transform.localPosition = new Vector3(0, 0, -1);
+		cell2.Element.transform.localPosition = new Vector3(0, 0, -1);
+
+		_fixedField = false;
+    }
 	#endregion
 	#endregion
 }

@@ -47,7 +47,7 @@ public partial class FieldController
 				break;
 		}
 
-		StartCoroutine(	SelectionElement(secondSelected));
+		StartCoroutine(SelectionElement(secondSelected));
     }
 	#endregion
 	#region Private
@@ -76,7 +76,10 @@ public partial class FieldController
 	/// <param name="cell">Ячейка.</param>
 	private void DestroyElement(CellController cell)
 	{
-		DestroyImmediate(cell.Element.gameObject);
+		var trans = cell.transform;
+        Instantiate(Parameters.Instance.PrefabExplosion, trans.position, trans.rotation);
+
+		Destroy(cell.Element.gameObject);
 		cell.Element = null;
 		DestroyElementsCount++;
     }

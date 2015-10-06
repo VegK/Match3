@@ -248,8 +248,6 @@ public partial class FieldController : MonoBehaviour
 		if (CheckElementsDestroyed())
 		{
 			DestroyElements();
-			while (_fixedField > 0)
-				yield return null;
 			LowerElements();
 			while (_fixedField > 0)
 				yield return null;

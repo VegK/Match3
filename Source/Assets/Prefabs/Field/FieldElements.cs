@@ -48,7 +48,7 @@ public partial class FieldController
 		}
 
 		StartCoroutine(SelectionElement(secondSelected));
-    }
+	}
 	#endregion
 	#region Private
 	/// <summary>
@@ -77,12 +77,12 @@ public partial class FieldController
 	private void DestroyElement(CellController cell)
 	{
 		var trans = cell.transform;
-        Instantiate(Parameters.Instance.PrefabExplosion, trans.position, trans.rotation);
+		Instantiate(Parameters.Instance.PrefabExplosion, trans.position, trans.rotation);
 
 		Destroy(cell.Element.gameObject);
 		cell.Element = null;
 		DestroyElementsCount++;
-    }
+	}
 	/// <summary>
 	/// Поменять местами элементы в ячейках.
 	/// </summary>
@@ -284,7 +284,7 @@ public partial class FieldController
 		{
 			_firstSelected = selected;
 			_firstSelected.Element.AnimationSelected();
-        }
+		}
 		else
 		{
 			_firstSelected.Element.StopAnimations();
@@ -329,7 +329,7 @@ public partial class FieldController
 	{
 		_fixedField++;
 
-        if (cell1.Y == cell2.Y)
+		if (cell1.Y == cell2.Y)
 		{
 			if (cell1.X > cell2.X)
 			{
@@ -364,7 +364,7 @@ public partial class FieldController
 		cell2.Element.transform.localPosition = new Vector3(0, 0, -1);
 
 		_fixedField--;
-    }
+	}
 	/// <summary>
 	/// Опустить элемент если под ним пустая ячейка.
 	/// </summary>
@@ -396,7 +396,7 @@ public partial class FieldController
 			yield return null;
 
 		var prevCell = toCell;
-        for (int y = cell.Y; y < _cells.GetLength(1); y++)
+		for (int y = cell.Y; y < _cells.GetLength(1); y++)
 		{
 			var cellY = _cells[x, y];
 			if (cellY == null)

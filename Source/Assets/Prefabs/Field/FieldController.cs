@@ -44,7 +44,7 @@ public partial class FieldController : MonoBehaviour
 
 		_cells = new CellController[Width, Height];
 
-        for (int x = 0; x < Width; x++)
+		for (int x = 0; x < Width; x++)
 		{
 			for (int y = 0; y < Height; y++)
 			{
@@ -144,7 +144,7 @@ public partial class FieldController : MonoBehaviour
 		BindCells();
 		CreateElements();
 		StartCoroutine(FullCheckField());
-    }
+	}
 	/// <summary>
 	/// Уничтожить ячейки и очистить массив ячеек.
 	/// </summary>
@@ -179,7 +179,7 @@ public partial class FieldController : MonoBehaviour
 			}
 		}
 		return res;
-    }
+	}
 	/// <summary>
 	/// Уничтожить на поле все элементы с флагом "Должеть быть уничтожен".
 	/// </summary>
@@ -196,7 +196,7 @@ public partial class FieldController : MonoBehaviour
 					DestroyElement(cell);
 			}
 		}
-    }
+	}
 	/// <summary>
 	/// Опустить элменты.
 	/// </summary>
@@ -218,9 +218,9 @@ public partial class FieldController : MonoBehaviour
 						{
 							LowerElement(cell2);
 							y = _cells.GetLength(1);
-                            break;
+							break;
 						}
-                    }
+					}
 			}
 	}
 	/// <summary>

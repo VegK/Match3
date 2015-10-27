@@ -21,7 +21,7 @@ public class FieldEditMode : MonoBehaviour
 	private void OnEnable()
 	{
 		_fieldController = GetComponent<FieldController>();
-    }
+	}
 	private void Update()
 	{
 		if (_fieldController != null)
@@ -30,7 +30,7 @@ public class FieldEditMode : MonoBehaviour
 			if (!_fieldController.CheckParams())
 				_fieldController.BindCells();
 		}
-    }
+	}
 	#endregion
 	#endregion
 }

@@ -41,7 +41,7 @@ public class ElementController : MonoBehaviour
 			return;
 		_animation.Stop();
 		transform.localScale = _defaultLocalScale;
-    }
+	}
 	/// <summary>
 	/// Запустить анимацию выбранного элемента.
 	/// </summary>
@@ -49,7 +49,7 @@ public class ElementController : MonoBehaviour
 	{
 		if (_animation != null)
 			_animation.Play(AnimationNames.Selected);
-    }
+	}
 	/// <summary>
 	/// Запустить анимацию движения элемента вниз.
 	/// </summary>
@@ -73,7 +73,7 @@ public class ElementController : MonoBehaviour
 	{
 		StopAnimations();
 		PlayAnimationMove(AnimationDirection.Down);
-    }
+	}
 	/// <summary>
 	/// Запустить анимацию движения элемента влево.
 	/// </summary>
@@ -97,7 +97,7 @@ public class ElementController : MonoBehaviour
 	{
 		_animation = GetComponent<Animation>();
 		_defaultLocalScale = transform.localScale;
-    }
+	}
 	/// <summary>
 	/// Запустить анимацию движения элемента.
 	/// </summary>

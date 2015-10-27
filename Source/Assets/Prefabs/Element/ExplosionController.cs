@@ -26,7 +26,7 @@ public class ExplosionController : MonoBehaviour
 	{
 		if (_particleSystem != null && !_particleSystem.IsAlive())
 			Destroy(gameObject);
-    }
+	}
 	#endregion
 	#endregion
 }
